@@ -1,7 +1,7 @@
-# Qualys official helm chart
+# Qualys helm charts
 
 # Sensor
 
 Docu: https://www.qualys.com/docs/qualys-container-sensor-deployment-guide.pdf
 
-https://github.com/Qualys/cs_sensor
+Official helm: https://github.com/Qualys/cs_sensor
