@@ -4,7 +4,7 @@ items:
   - kind: Namespace
     apiVersion: v1
     metadata:
-      name: qualys
+      name: qualys-sensor
   # Service Account
   - kind: ServiceAccount
     apiVersion: v1
