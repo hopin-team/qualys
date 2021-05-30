@@ -1,0 +1,150 @@
+kind: List
+apiVersion: v1
+items:
+  - kind: Namespace
+    apiVersion: v1
+    metadata:
+      name: qualys
+  # Service Account
+  - kind: ServiceAccount
+    apiVersion: v1
+    metadata:
+      name: qualys-service-account
+      namespace: qualys
+  # Role for read/write/delete permission to qualys namespace
+  - kind: Role
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: qualys-reader-role
+      namespace: qualys
+    rules:
+    - apiGroups: [""]
+      resources: ["pods"]
+      verbs: ["get", "list", "watch","create", "delete", "deletecollection"]
+    - apiGroups: [""]
+      resources: ["pods/status"]
+      verbs: ["get"]
+    - apiGroups: [""]
+      resources: ["pods/attach", "pods/exec"]
+      verbs: ["create"]
+  - kind: ClusterRole
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: qualys-cluster-reader-role
+    rules:
+    - apiGroups: [""]
+      resources: ["nodes"]
+      verbs: ["get"]
+  # RoleBinding to assign permissions in qualys-reader-role to qualys-service-account
+  - kind: RoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: qualys-reader-role-rb
+      namespace: qualys
+    subjects:
+    - kind: ServiceAccount
+      name: qualys-service-account
+      namespace: qualys
+    roleRef:
+      kind: Role
+      name: qualys-reader-role
+      apiGroup: rbac.authorization.k8s.io
+  - kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: qualys-cluster-reader-rb
+    subjects:
+    - kind: ServiceAccount
+      name: qualys-service-account
+      namespace: qualys
+    roleRef:
+      kind: ClusterRole
+      name: qualys-cluster-reader-role
+      apiGroup: rbac.authorization.k8s.io
+  # Qualys Container Sensor pod with
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    metadata:
+      name: qualys-container-sensor
+      namespace: qualys
+      labels:
+        k8s-app: qualys-cs-sensor
+    spec:
+      selector:
+        matchLabels:
+          name: qualys-container-sensor
+      updateStrategy:
+          type: RollingUpdate
+      template:
+        metadata:
+          labels:
+            name: qualys-container-sensor
+        spec:
+          #tolerations:
+          # this toleration is to have the daemonset runnable on master nodes
+          # Uncomment it if want your masters to run sensor pod
+          #- key: node-role.kubernetes.io/master
+          #  effect: NoSchedule
+          serviceAccountName: qualys-service-account
+          containers:
+          - name: qualys-container-sensor
+            image: qualys/qcs-sensor:latest
+            imagePullPolicy : IfNotPresent
+            resources:
+              limits:
+                cpu: {{ .Values.qualys.cpu }} # Default CPU usage limit on each node for sensor=0.2
+            args: {{ .Values.qualys.args }}
+            env:
+            - name: CUSTOMERID
+              value: {{ .Values.qualys.customerID }}
+            - name: ACTIVATIONID
+              value: {{ .Values.qualys.activationID }}
+            - name: POD_URL
+              value:
+            - name: QUALYS_SCANNING_CONTAINER_LAUNCH_TIMEOUT
+              value: "10"
+# uncomment(and indent properly) below section if using Docker HTTP socket with TLS
+            #- name: DOCKER_TLS_VERIFY
+            #  value: "1"
+# uncomment(and indent properly) below section if proxy is required to connect Qualys Cloud
+            #- name: qualys_https_proxy
+            #  value: <proxy FQDN or Ip address>:<port#>
+#            volumeMounts:
+#            - mountPath: /var/run
+#              name: socket-volume
+#            - mountPath: /usr/local/qualys/qpa/data
+#              name: persistent-volume
+#            - mountPath: /usr/local/qualys/qpa/data/conf/agent-data
+#              name: agent-volume
+# uncomment(and indent properly) below section if proxy(with CA cert) required to connect Qualys Cloud
+            #- mountPath: /etc/qualys/qpa/cert/custom-ca.crt
+            #  name: proxy-cert-path
+# uncomment(and indent properly) below section if using Docker HTTP socket with TLS
+            #- mountPath: /root/.docker
+            #  name: tls-cert-path
+            securityContext:
+              allowPrivilegeEscalation: false
+#          volumes:
+#            - name: socket-volume
+#              hostPath:
+#                path: /var/run
+#                type: Directory
+#            - name: persistent-volume
+#              hostPath:
+#                path: /usr/local/qualys/sensor/data
+#                type: DirectoryOrCreate
+#            - name: agent-volume
+#              hostPath:
+#                path: /etc/qualys
+#                type: DirectoryOrCreate
+# uncomment(and indent properly) below section if proxy(with CA cert) required to connect Qualys Cloud
+            #- name: proxy-cert-path
+            #  hostPath:
+            #    path: <proxy certificate path>
+            #    type: File
+# uncomment(and indent properly) below section if using Docker HTTP socket with TLS
+            #- name: tls-cert-path
+            #  hostPath:
+            #    path: <Path of directory of client certificates>
+            #    type: Directory
+          hostNetwork: true
