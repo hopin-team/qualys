@@ -4,7 +4,7 @@ items:
   - kind: Namespace
     apiVersion: v1
     metadata:
-      name: qualys-sensor
+      name: qualys
   # Service Account
   - kind: ServiceAccount
     apiVersion: v1
@@ -112,8 +112,9 @@ items:
             volumeMounts:
             - mountPath: /var/run
               name: socket-volume
-            - mountPath: /usr/local/qualys/qpa/data
-              name: persistent-volume
+# uncomment if using persistent volumes
+#            - mountPath: /usr/local/qualys/qpa/data
+#              name: persistent-volume
             - mountPath: /usr/local/qualys/qpa/data/conf/agent-data
               name: agent-volume
 # uncomment(and indent properly) below section if proxy(with CA cert) required to connect Qualys Cloud
@@ -129,10 +130,11 @@ items:
               hostPath:
                 path: /var/run
                 type: Directory
-            - name: persistent-volume
-              hostPath:
-                path: /usr/local/qualys/sensor/data
-                type: DirectoryOrCreate
+# un comment if persistent volumes used
+#            - name: persistent-volume
+#              hostPath:
+#                path: /usr/local/qualys/sensor/data
+#                type: DirectoryOrCreate
             - name: agent-volume
               hostPath:
                 path: /etc/qualys
