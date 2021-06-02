@@ -125,6 +125,11 @@ items:
             #  name: tls-cert-path
             securityContext:
               allowPrivilegeEscalation: false
+          volumes:
+            - name: socket-volume
+              hostPath:
+                path: /var/run
+                type: Directory
 # un comment if persistent volumes used
 #            - name: persistent-volume
 #              hostPath:
