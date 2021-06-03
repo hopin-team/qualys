@@ -128,7 +128,7 @@ items:
           volumes:
             - name: socket-volume
               hostPath:
-                path: /var/run
+                path: /var/run/docker.sock
                 type: Directory
 # un comment if persistent volumes used
 #            - name: persistent-volume
