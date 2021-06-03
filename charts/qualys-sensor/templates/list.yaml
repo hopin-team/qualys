@@ -88,8 +88,8 @@ items:
           serviceAccountName: qualys-service-account
           containers:
           - name: qualys-container-sensor
-            image: qualys/qcs-sensor:latest
-            imagePullPolicy : IfNotPresent
+            image: {{ .Values.qualys.image }}
+            imagePullPolicy : {{ .Values.qualys.imagePullPolicy }}
             resources:
               limits:
                 cpu: {{ .Values.qualys.cpu }} # Default CPU usage limit on each node for sensor=0.2
@@ -100,7 +100,7 @@ items:
             - name: ACTIVATIONID
               value: {{ .Values.qualys.activationID }}
             - name: POD_URL
-              value:
+              value: {{ .Values.qualys.pod_url }}
             - name: QUALYS_SCANNING_CONTAINER_LAUNCH_TIMEOUT
               value: "10"
 # uncomment(and indent properly) below section if using Docker HTTP socket with TLS
