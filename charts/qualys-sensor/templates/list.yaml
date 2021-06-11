@@ -110,7 +110,7 @@ items:
             #- name: qualys_https_proxy
             #  value: <proxy FQDN or Ip address>:<port#>
             volumeMounts:
-            - mountPath: /var/run
+            - mountPath: /var/run/docker.sock
               name: socket-volume
 # uncomment if using persistent volumes
 #            - mountPath: /usr/local/qualys/qpa/data
@@ -129,7 +129,6 @@ items:
             - name: socket-volume
               hostPath:
                 path: /var/run/docker.sock
-                type: Directory
 # un comment if persistent volumes used
 #            - name: persistent-volume
 #              hostPath:
