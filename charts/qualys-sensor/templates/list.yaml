@@ -93,6 +93,7 @@ items:
             resources:
               limits:
                 cpu: {{ .Values.cpu }} # Default CPU usage limit on each node for sensor=0.2
+                memory: {{ .Values.mem }}
             args: {{ .Values.args }}
             env:
             - name: CUSTOMERID

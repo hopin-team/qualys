@@ -6,3 +6,4 @@ imagePullPolicy: "IfNotPresent"
 # args for configuring the sensor - see documentaiton on sensor deployment
 args: "[\"--k8s-mode\", \"--log-level\", \"3\", \"--sensor-without-persistent-storage\", \"--enable-console-logs\"]"
 cpu: "0.2"
+mem: "128Mi"
