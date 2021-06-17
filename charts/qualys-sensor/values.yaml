@@ -1,9 +1,9 @@
 customerID: ""
 activationID: ""
 pod_url: POD_URL_from_sensor_deployment_guide_page_13_include_https://
-image: "qualys/qcs-sensor:latest"  #Qualys sensor image location
+image: "qualys/qcs-sensor:1.8.0-3"  #Qualys sensor image location
 imagePullPolicy: "IfNotPresent"
 # args for configuring the sensor - see documentaiton on sensor deployment
 args: "[\"--k8s-mode\", \"--log-level\", \"3\", \"--sensor-without-persistent-storage\", \"--enable-console-logs\"]"
 cpu: "0.2"
-mem: "128Mi"
+mem: "256Mi"
